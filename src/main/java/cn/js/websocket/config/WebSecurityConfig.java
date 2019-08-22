@@ -6,36 +6,60 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+/**
+ * @author JiaShun
+ * @date 2017-08-22 11:44
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    protected void configure(HttpSecurity httpSecurity) throws Exception{
+    /**
+     * 设置Spring Security对/和/"login"路径不拦截
+     * 设置SpringSecurity的登录页面为/login
+     * 登录成功后转向/chat路径
+     * @param httpSecurity HttpSecurity
+     * @throws Exception Exception
+     */
+    @Override
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeRequests()
-                .antMatchers("/","/login")//设置Spring Security对/和/"login"路径不拦截
+                .antMatchers("/","/login")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")//设置SpringSecurity的登录页面为/login
-                .defaultSuccessUrl("/chat")//登录成功后转向/chat路径
+                .loginPage("/login")
+                .defaultSuccessUrl("/chat")
                 .permitAll()
                 .and()
                 .logout()
                 .permitAll();
     }
-    //在内存中分配两个用户Michael和Janet，密码都为freedom，角色都是USER
-    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception{
+
+    /**
+     * 在内存中分配两个用户Michael和Janet，密码都为freedom，角色都是USER
+     * @param authenticationManagerBuilder AuthenticationManagerBuilder
+     * @throws Exception Exception
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
         authenticationManagerBuilder
                 .inMemoryAuthentication()
                 .withUser("Michael").password("freedom").roles("USER")
                 .and()
                 .withUser("Janet").password("freedom").roles("USER");
     }
-    // /resources/static/目录下的静态资源，Spring Security不拦截
-    public void configure(WebSecurity webSecurity)throws Exception{
+
+    /**
+     * /resources/static/目录下的静态资源，Spring Security不拦截
+     * @param webSecurity webSecurity
+     */
+    @Override
+    public void configure(WebSecurity webSecurity) {
         webSecurity.ignoring().antMatchers("/resources/static/**");
     }
 
